@@ -6,6 +6,13 @@ It's a 2D platformer with gun recoil movement machaniques.
 
 I will update as I progress with the project.
 
+### July 24th
+- Added a score system that checks time
+- implemented sound
+- Added powerup 
+- Added backgrounds and lighting
+- Prototype is now a fully working level with title screen pause and level cleared
+
 ### July 11th
 Added 
 - slime enemy with animation and basic AI
@@ -15,4 +22,8 @@ Added
 
 ### July 6th
 Basic movement and animation for the player
+
+
+
+
 
