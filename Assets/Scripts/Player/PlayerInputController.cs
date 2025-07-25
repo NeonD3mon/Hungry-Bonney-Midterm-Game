@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 public class PlayerInputController : MonoBehaviour
@@ -6,6 +7,7 @@ public class PlayerInputController : MonoBehaviour
     private PlayerAnimation playerAnimation;
     private GunBehavior gun;
     private GroundCheck groundCheck;
+    private SoundManagerScript soundManager;
     private Bullet bullet;
     public bool jumping { get; set; }
     public bool attacking { get; set; }
@@ -14,10 +16,11 @@ public class PlayerInputController : MonoBehaviour
     private Vector2 lastValidDirection = Vector2.right;
     private float lastAttackTime;
     public float MoveDirection { get; set; }
+    public Utilities.GameState CurrentState;
 
     
 
-    [SerializeField] float attackCooldown = 0.3f;
+    [SerializeField] float attackCooldown = 0.5f;
     [SerializeField] KeyCode _attack;
     [SerializeField] KeyCode _jump;
     [SerializeField] KeyCode _reload;
@@ -26,6 +29,7 @@ public class PlayerInputController : MonoBehaviour
 
     void Start()
     {
+        CurrentState = Utilities.GameState.Play;
         mainCam = Camera.main;
         playerAnimation = GetComponent<PlayerAnimation>();
         groundCheck = GetComponent<GroundCheck>();
@@ -34,34 +38,46 @@ public class PlayerInputController : MonoBehaviour
     
     }
 
-    
+
     void Update()
     {
-        HandleInput();
-        UpdateDirection();
+        if (CurrentState == Utilities.GameState.Play)
+        {
+            HandleInput();
+            UpdateDirection();
+        }
+        else
+            return;
+       
 
     }
 
     void HandleInput()
     {
-        MoveDirection = Input.GetAxis("Horizontal");
-        if (groundCheck.isGrounded && Input.GetKeyDown(_jump))
+       
+        
+            MoveDirection = Input.GetAxis("Horizontal");
+            
+            if (groundCheck.isGrounded && Input.GetKeyDown(_jump) || groundCheck.isGrounded && Input.GetKeyDown(KeyCode.W))
             jumping = true;
 
 
-        if (Input.GetKeyDown(_attack) && Time.time >= lastAttackTime + attackCooldown && gun.reloading == false)
-        {
-            UpdateDirection();
-            PlayerAttack();
-            gun.ApplyRecoil(lastValidDirection);
+            if (Input.GetKeyDown(_attack) && Time.time >= lastAttackTime + attackCooldown && gun.reloading == false)
+            {
+                UpdateDirection();
+                attacking = true;
+                PlayerAttack();
+                gun.ApplyRecoil(lastValidDirection);
 
-            lastAttackTime = Time.time;
-        }
-        if (Input.GetKeyDown(_reload) && gun.Magazine > 0)
-        {
-            gun.reloading = true;
-            gun.StartCoroutine(gun.Reload());
-        }
+                lastAttackTime = Time.time;
+            }
+            if (Input.GetKeyDown(_reload) && gun.Magazine > 0)
+            {
+                gun.reloading = true;
+                gun.StartCoroutine(gun.Reload());
+            }
+        
+       
             
     }
 
@@ -85,11 +101,13 @@ public class PlayerInputController : MonoBehaviour
 }
 
     void PlayerAttack()
-    {  
-        attacking = true;
+    {
+        
         moveCamera = true;
         gun.Fire();
+        gun.PlaySound(gun._fire);
         playerAnimation.animator.SetTrigger("attack");
+        attacking = false;
     }
 
 

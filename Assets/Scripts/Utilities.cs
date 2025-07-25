@@ -5,7 +5,7 @@ public class Utilities : MonoBehaviour
 
      public enum GameState
     {
-        Play, Pause, Main
+        Play, Pause
     }
 
     void Start()

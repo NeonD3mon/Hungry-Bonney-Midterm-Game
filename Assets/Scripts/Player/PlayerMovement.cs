@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -66,8 +67,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (other.gameObject.CompareTag("winZone"))
         {
-            game.SetHighScore();
-            game.RestartLevel();
+            game.StopTimer();
+            SceneManager.LoadScene(2);
         }
             
     }

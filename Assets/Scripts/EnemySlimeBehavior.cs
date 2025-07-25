@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class EnemySlimeBehavior : MonoBehaviour
 {
@@ -7,9 +8,11 @@ public class EnemySlimeBehavior : MonoBehaviour
     private Rigidbody2D rb;
     private GroundCheck groundCheck;
     private Utilities utilities;
+    private SoundManagerScript soundManager;
     public BoxCollider2D wallCheckRight;
     public BoxCollider2D wallCheckLeft;
     public EdgeCollider2D slimeBodyCollider;
+    private Light2D innerLight;
     public LayerMask wallMask;
     private Vector2 SlimeMovement;
     public bool jumping;
@@ -21,11 +24,29 @@ public class EnemySlimeBehavior : MonoBehaviour
 
     [SerializeField] float _jumpForce = 5;
     [SerializeField] float _horizontalMove = 3.5f;
+    private bool isVisible = false;
+    private AudioSource _source;
+    public AudioClip _slimeDamage;
+    public AudioClip _slimeDie;
+    public AudioClip _slimeJump;
+
+
+    void OnBecameVisible()
+    {
+        isVisible = true;
+    }
+
+    void OnBecameInvisible()
+    {
+        isVisible = false;
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         groundCheck = GetComponent<GroundCheck>();
+        innerLight = GetComponentInChildren<Light2D>();
+        _source = GetComponent<AudioSource>();
 
 
         Debug.Log($"rb: {rb}");
@@ -43,6 +64,7 @@ public class EnemySlimeBehavior : MonoBehaviour
     {
         jumping = !groundCheck.isGrounded;
         EnemySlimeAnimate();
+        HandleSound();
     }
 
     IEnumerator Movement()
@@ -65,7 +87,9 @@ public class EnemySlimeBehavior : MonoBehaviour
                     SlimeMovement.x = -_horizontalMove;
 
                 yield return new WaitForSeconds(0.5f);
+                jumping = true;
                 rb.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
+                jumping = false;
             }
             else
             {
@@ -76,7 +100,10 @@ public class EnemySlimeBehavior : MonoBehaviour
                     SlimeMovement.x = _horizontalMove;
 
                 yield return new WaitForSeconds(0.5f);
+                jumping = true;
                 rb.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
+                jumping = false;
+
             }
 
 
@@ -100,28 +127,55 @@ public class EnemySlimeBehavior : MonoBehaviour
         transform.localScale = new Vector3(EnemyDirection, 1, 1);
         animator.SetBool("jump", jumping);
         animator.SetBool("isGrounded", groundCheck.isGrounded);
-       
-           
+
+
+    }
+
+    void HandleSound()
+    {
+        if (isVisible == true && jumping == true)
+            _source.PlayOneShot(_slimeJump);
+
+       // if (isVisible == true && isAlive == false)
+        //    _source.PlayOneShot(_slimeDie);
     }
 
     public void TakeDamage(int damage)
     {
-        isHit = true;
+        
         animator.SetTrigger("isHit");
         health -= damage;
         Debug.Log($"Enemy health: {health}");
-        isHit = false;
+
+
+
         if (health <= 0)
         {
             isAlive = false;
-           
+            if (isVisible && _slimeDie != null)
+                _source.PlayOneShot(_slimeDie);
+
+            StartCoroutine(DisableLightAfterDelay(0.5f));
             Destroy(gameObject, 2f);
         }
+        else if (isVisible && _slimeDamage != null)
+        {
+            Debug.Log($"Trying to play slime damage: {_slimeDamage.name}, health: {health}");
+            _source.PlayOneShot(_slimeDamage);
+        }
+        
+
         animator.SetBool("isAlive", isAlive);
     }
+    IEnumerator DisableLightAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Destroy(innerLight);
+    }
+
    
     
-
+ 
 }
 
 

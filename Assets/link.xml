@@ -1,0 +1,11 @@
+<linker>
+  <assembly fullname="Unity.VisualScripting.Core">
+    <type fullname="Unity.VisualScripting.*" preserve="all"/>
+  </assembly>
+  <assembly fullname="Unity.VisualScripting.Flow">
+    <type fullname="Unity.VisualScripting.*" preserve="all"/>
+  </assembly>
+  <assembly fullname="Unity.VisualScripting.State">
+    <type fullname="Unity.VisualScripting.*" preserve="all"/>
+  </assembly>
+</linker>

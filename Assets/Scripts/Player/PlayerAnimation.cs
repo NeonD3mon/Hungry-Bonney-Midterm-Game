@@ -33,7 +33,7 @@ public class PlayerAnimation : MonoBehaviour
     void PlayerAnimate()
     {
 
-        // if (Mathf.Abs(MoveDirection) > 0.01f)
+        
 
 
 
@@ -43,7 +43,7 @@ public class PlayerAnimation : MonoBehaviour
             float angle = Mathf.Atan2(input.direction.y, input.direction.x) * Mathf.Rad2Deg;
             armTransform.rotation = Quaternion.Euler(0, 0, angle);
             if (input.direction.x < 0)
-                armTransform.localScale = new Vector3(-1, -1, 1); // Flip the gunwith the player
+                armTransform.localScale = new Vector3(-1, -1, 1); // Flip the gun with the player
 
 
             else
